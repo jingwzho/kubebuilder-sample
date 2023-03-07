@@ -22,14 +22,23 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+const (
+	// MachineFinalizer allows ReconcileOpenStackMachine to clean up OpenStack resources associated with OpenStackMachine before
+	// removing it from the apiserver.
+	MachineFinalizer = "openstackmachine.infrastructure.cluster.x-k8s.io"
+)
+
 // FooSpec defines the desired state of Foo
-type FooSpec struct {
+type MachineSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	// the name of deployment which is owned by foo
 	DeploymentName string `json:"deploymentName"`
-
+	Flavor         string `json:"flavor"`
+	Image          string `json:"image,omitempty"`
+	Name           string `json:"name"`
+	InstanceID     string `json:"instanceID,omitempty"`
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
 
@@ -38,7 +47,7 @@ type FooSpec struct {
 }
 
 // FooStatus defines the observed state of Foo
-type FooStatus struct {
+type MachineStatus struct {
 	// this is equal deployment.status.availableReplicas
 	// +optional
 	AvailableReplicas int32 `json:"availableReplicas"`
@@ -48,23 +57,23 @@ type FooStatus struct {
 // +kubebuilder:subresource:status
 
 // Foo is the Schema for the foos API
-type Foo struct {
+type Machine struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   FooSpec   `json:"spec,omitempty"`
-	Status FooStatus `json:"status,omitempty"`
+	Spec   MachineSpec   `json:"spec,omitempty"`
+	Status MachineStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // FooList contains a list of Foo
-type FooList struct {
+type MachineList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Foo `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Foo{}, &FooList{})
+	SchemeBuilder.Register(&Machine{}, &MachineList{})
 }
